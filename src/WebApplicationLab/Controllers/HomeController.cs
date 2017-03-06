@@ -59,20 +59,45 @@ namespace WebApplicationLab.Controllers
             return View();
         }
 
-        public ActionResult ShowPerson()
+        public IActionResult ShowPerson(Person person)
         {
+
             ViewData["Heading"] = "Personal Information";
 
-            var student = new Person();
-            student.FirstName = "Thomas";
-            student.LastName = "Howley";
-            student.Birthday = new DateTime(1988, 12, 7);
 
+            Person student = person;
             ViewData["Name"] = student.FirstName + " " + student.LastName;
             ViewData["Birthday"] = student.Birthday;
+            DateTime birthday = DateTime.Parse(student.Birthday);
+            if(DateTime.Now.DayOfYear - birthday.DayOfYear > 0 || DateTime.Now.Year == birthday.Year)
+            {
+                student.Age = DateTime.Now.Date.Year - birthday.Year;
+            }
+            else
+            {
+                student.Age = DateTime.Now.Date.Year - birthday.Year - 1;
+            }
             ViewData["Age"] = student.Age;
 
             return View();
+        }
+
+        public IActionResult AddPerson()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddPerson(Person person)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("ShowPerson", person);
+            }
+            else
+            {
+                return View(person);
+            }
         }
     }
 }
